@@ -109,7 +109,7 @@
       <TimeZone>PST</TimeZone>
       <UserAccounts>
         <AdministratorPassword>
-          <Value>vagrant</Value>
+          <Value>Encore2017</Value>
           <PlainText>true</PlainText>
         </AdministratorPassword>
         <LocalAccounts>

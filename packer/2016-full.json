@@ -1,0 +1,67 @@
+{
+    "builders": [
+        {
+      "type": "virtualbox-iso",
+      "vboxmanage": [
+        [ "modifyvm", "{{.Name}}", "--memory", "{{.memory}}" ],
+        [ "modifyvm", "{{.Name}}", "--vram", "48" ],
+        [ "modifyvm", "{{.Name}}", "--cpus", "{{.cpus}}" ]
+      ],
+      "vboxmanage_post": [
+        [ "storageattach", "{{.Name}}", "--storagectl", "IDE Controller", "--port", "1", "--device", "0", "--medium", "none" ]
+      ],
+      "guest_additions_mode": "{{ user `guest_additions_mode` }}",
+      "guest_os_type": "Windows2012_64",
+      "headless": "{{ user `headless` }}",
+      "iso_url": "{{ user `iso_url` }}",
+      "iso_checksum": "{{ user `iso_checksum` }}",
+      "iso_checksum_type": "{{ user `iso_checksum_type` }}",
+      "communicator": "winrm",
+      "winrm_username": "vagrant",
+      "winrm_password": "vagrant",
+      "winrm_timeout": "12h",
+      "shutdown_command": "C:/Windows/Panther/Unattend/packer_shutdown.bat",
+      "shutdown_timeout": "15m",
+      "floppy_files": [
+        "../answer-files/2016/Autounattend.xml",
+        "../scripts/winrm.ps1"
+      ]
+    },
+    {
+            "type": "vmware-iso",
+            "vmx_data": {
+                "gui.fitguestusingnativedisplayresolution": "false",
+                "RemoteDisplay.vnc.enabled": "false",
+                "RemoteDispaly.vnc.port": "5900",
+                "memsize": "{{.memory}}",
+                "numvcpus": "{{.cpus}}",
+                "scsi0.virtualDev": "lsisas1068"
+            },
+            "guest_os_type": "windows9srv-64",
+            "headless": "{{ user `headless` }}",
+            "iso_url": "{{ user `iso_url` }}",
+            "iso_checksum": "{{ user `iso_checksum` }}",
+            "iso_checksum_type": "{{ user `iso_checksum_type` }}",
+            "communicator": "winrm",
+            "winrm_username": "vagrant",
+            "winrm_password": "vagrant",
+            "winrm_timeout": "12h",
+            "shutdown_command": "C:/Windows/Panther/Unattend/packer_shutdown.bat",
+            "shutdown_timeout": "15m",
+            "tools_upload_flavor": "windows",
+            "skip_compaction": "false",
+            "floppy_files": [
+                "../answer-files/2016/Autounattend.xml",
+                "../scripts/winrm.ps1"
+            ]
+        }
+    ],
+    "variables": {
+        "memory": "2048",
+        "cpus": "2",
+        "headless": "true",
+        "iso_checksum": "f185197af68fae4f0e06510a4579fc511ba27616",
+        "iso_url": "./iso_images/en_windows_server_2016_x64_dvd_9718492.iso",
+        "iso_checksum_type": "sha1"
+    }
+}

@@ -3,12 +3,9 @@
         {
       "type": "virtualbox-iso",
       "vboxmanage": [
-        [ "modifyvm", "{{.Name}}", "--memory", "{{.memory}}" ],
+        [ "modifyvm", "{{.Name}}", "--memory", "{{ user `memory` }}" ],
         [ "modifyvm", "{{.Name}}", "--vram", "48" ],
-        [ "modifyvm", "{{.Name}}", "--cpus", "{{.cpus}}" ]
-      ],
-      "vboxmanage_post": [
-        [ "storageattach", "{{.Name}}", "--storagectl", "IDE Controller", "--port", "1", "--device", "0", "--medium", "none" ]
+        [ "modifyvm", "{{.Name}}", "--cpus", "{{ user `cpus` }}" ]
       ],
       "guest_additions_mode": "{{ user `guest_additions_mode` }}",
       "guest_os_type": "Windows2012_64",
@@ -20,7 +17,7 @@
       "winrm_username": "vagrant",
       "winrm_password": "vagrant",
       "winrm_timeout": "12h",
-      "shutdown_command": "C:/Windows/Panther/Unattend/packer_shutdown.bat",
+      "shutdown_command": "shutdown /s /t 10 /f /d p:4:1 /c \"Packer Shutdown\"",
       "shutdown_timeout": "15m",
       "floppy_files": [
         "../answer-files/2016/Autounattend.xml",
@@ -33,8 +30,8 @@
                 "gui.fitguestusingnativedisplayresolution": "false",
                 "RemoteDisplay.vnc.enabled": "false",
                 "RemoteDispaly.vnc.port": "5900",
-                "memsize": "{{.memory}}",
-                "numvcpus": "{{.cpus}}",
+                "memsize": "{{ user `memory` }}",
+                "numvcpus": "{{ user `cpus` }}",
                 "scsi0.virtualDev": "lsisas1068"
             },
             "guest_os_type": "windows9srv-64",
@@ -46,7 +43,7 @@
             "winrm_username": "vagrant",
             "winrm_password": "vagrant",
             "winrm_timeout": "12h",
-            "shutdown_command": "C:/Windows/Panther/Unattend/packer_shutdown.bat",
+            "shutdown_command": "shutdown /s /t 10 /f /d p:4:1 /c \"Packer Shutdown\"",
             "shutdown_timeout": "15m",
             "tools_upload_flavor": "windows",
             "skip_compaction": "false",
@@ -56,12 +53,45 @@
             ]
         }
     ],
+    "provisioners": [
+        {
+            "type": "chef-solo",
+            "cookbook_paths": ["../cookbooks", "../vendor/cookbooks"],
+            "guest_os_type": "windows",
+            "run_list": [
+                "wsus-client::configure"
+            ]
+        },
+        {
+            "type": "windows-restart",
+            "restart_timeout": "15m"
+        },
+        {
+            "type": "chef-solo",
+            "remote_cookbook_paths": [
+                "c:/windows/temp/packer-chef-solo/cookbooks-0",
+                "c:/windows/temp/packer-chef-solo/cookbooks-1"
+            ],
+            "guest_os_type": "windows",
+            "skip_install": "true",
+            "run_list": [
+            ]
+        }
+    ],
+    "post-processors": [
+        {
+        "type": "vagrant",
+        "keep_input_artifact": true,
+        "output": "windows2012r2min-{{.Provider}}.box",
+        "vagrantfile_template": "vagrantfile-windows.template"
+        }
+    ],
     "variables": {
         "memory": "2048",
         "cpus": "2",
         "headless": "true",
         "iso_checksum": "f185197af68fae4f0e06510a4579fc511ba27616",
-        "iso_url": "./iso_images/en_windows_server_2016_x64_dvd_9718492.iso",
+        "iso_url": "../iso-images/en_windows_server_2016_x64_dvd_9718492.iso",
         "iso_checksum_type": "sha1"
     }
 }

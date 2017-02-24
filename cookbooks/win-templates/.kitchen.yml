@@ -1,0 +1,21 @@
+---
+driver:
+  name: vagrant
+
+provisioner:
+  name: chef_solo
+
+transport:
+  name: winrm
+  elevated: true
+  password: vagrant
+  username: vagrant
+
+platforms:
+  - name: windows-2016
+
+suites:
+  - name: default
+    run_list:
+      - recipe[win-templates::default]
+    attributes:

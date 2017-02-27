@@ -1,15 +1,21 @@
 ---
 driver:
+  communicator: winrm
+  forward_agent: yes
   name: vagrant
-
-provisioner:
-  name: chef_solo
+  provider: vmware_fusion
+  customize:
+    memory: 4096
+  network:
+  - ["forwarded_port", {guest: 5985, host: 5985}]
 
 transport:
   name: winrm
-  elevated: true
   password: vagrant
   username: vagrant
+
+provisioner:
+  name: chef_solo
 
 platforms:
   - name: windows-2016

@@ -21,4 +21,4 @@ Todo:
 Build golden image:
 * Download the windows 2016 ISO image to the ./iso-images folder
 * Update the ./packer/2016-full.json file with the right path, checksum
-* Run [packer build -force -only virtualbox 2016-full.json]
+* Run [packer build -force -only virtualbox-iso 2016-full.json]

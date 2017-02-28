@@ -6,13 +6,12 @@ driver:
   provider: vmware_fusion
   customize:
     memory: 4096
-  network:
-  - ["forwarded_port", {guest: 5985, host: 5985}]
 
 transport:
   name: winrm
   password: vagrant
   username: vagrant
+  elevated: true
 
 provisioner:
   name: chef_solo
@@ -24,4 +23,12 @@ suites:
   - name: default
     run_list:
       - recipe[win-templates::default]
+      - recipe[win-templates::disable_sam_notifications]
+      - recipe[win-templates::disable_UAC]
+      - recipe[win-templates::disable_shutdown_tracker]
+      - recipe[win-templates::enable_net35]
+      - recipe[win-templates::show_hiddenFiles]
+      - recipe[win-templates::show_extensions]
+      - recipe[win-templates::enable_containers]
+      - recipe[win-templates::enable_docker]
     attributes:

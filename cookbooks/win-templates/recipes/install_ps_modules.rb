@@ -1,5 +1,5 @@
 powershell_script 'install Nuget package provider' do
-  code 'Install-PackageProvider -Name NuGet -Force'
+  code "Install-PackageProvider NuGet -MinimumVersion '2.8.5.201' -Force"
   not_if '(Get-PackageProvider -Name Nuget -ListAvailable -ErrorAction SilentlyContinue) -ne $null'
 end
 

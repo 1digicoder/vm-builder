@@ -3,7 +3,6 @@ driver:
   communicator: winrm
   forward_agent: yes
   name: vagrant
-  provider: vmware_fusion
   customize:
     memory: 4096
 

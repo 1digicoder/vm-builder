@@ -1,30 +1,33 @@
 {
     "builders": [
         {
-      "type": "virtualbox-iso",
-      "vboxmanage": [
-        [ "modifyvm", "{{.Name}}", "--memory", "{{ user `memory` }}" ],
-        [ "modifyvm", "{{.Name}}", "--vram", "48" ],
-        [ "modifyvm", "{{.Name}}", "--cpus", "{{ user `cpus` }}" ]
-      ],
-      "guest_additions_mode": "{{ user `guest_additions_mode` }}",
-      "guest_os_type": "Windows2012_64",
-      "headless": "{{ user `headless` }}",
-      "iso_url": "{{ user `iso_url` }}",
-      "iso_checksum": "{{ user `iso_checksum` }}",
-      "iso_checksum_type": "{{ user `iso_checksum_type` }}",
-      "communicator": "winrm",
-      "winrm_username": "vagrant",
-      "winrm_password": "vagrant",
-      "winrm_timeout": "12h",
-      "shutdown_command": "shutdown /s /t 10 /f /d p:4:1 /c \"Packer Shutdown\"",
-      "shutdown_timeout": "15m",
-      "floppy_files": [
-        "../answer-files/2016/Autounattend.xml",
-        "../scripts/winrm.ps1"
-      ]
-    },
-    {
+            "type": "virtualbox-iso",
+            "vboxmanage": [
+                [ "modifyvm", "{{.Name}}", "--memory", "{{ user `memory` }}" ],
+                [ "modifyvm", "{{.Name}}", "--vram", "48" ],
+                [ "modifyvm", "{{.Name}}", "--cpus", "{{ user `cpus` }}" ]
+            ],
+            "guest_additions_mode": "{{ user `guest_additions_mode` }}",
+            "guest_additions_path": "{{ user `vboxTools_iso_path` }}",
+            "guest_os_type": "Windows2012_64",
+            "boot_wait": "2m",
+            "headless": "{{ user `headless` }}",
+            "iso_url": "{{ user `iso_url` }}",
+            "iso_checksum": "{{ user `iso_checksum` }}",
+            "iso_checksum_type": "{{ user `iso_checksum_type` }}",
+            "disk_size": "{{ user `vm_disk_size` }}",
+            "communicator": "winrm",
+            "winrm_username": "vagrant",
+            "winrm_password": "vagrant",
+            "winrm_timeout": "12h",
+            "shutdown_command": "shutdown /s /t 10 /f /d p:4:1 /c \"Packer Shutdown\"",
+            "shutdown_timeout": "15m",
+            "floppy_files": [
+                "../answer-files/2016/Autounattend.xml",
+                "../scripts/winrm.ps1"
+            ]
+        },
+        {
             "type": "vmware-iso",
             "vmx_data": {
                 "gui.fitguestusingnativedisplayresolution": "false",
@@ -35,10 +38,15 @@
                 "scsi0.virtualDev": "lsisas1068"
             },
             "guest_os_type": "windows9srv-64",
+            "boot_wait": "2m",
             "headless": "{{ user `headless` }}",
             "iso_url": "{{ user `iso_url` }}",
             "iso_checksum": "{{ user `iso_checksum` }}",
             "iso_checksum_type": "{{ user `iso_checksum_type` }}",
+            "disk_size": "{{ user `vm_disk_size` }}",
+            "vnc_port_min": 5900,
+            "vnc_port_max": 5980,
+            "version": 11,
             "communicator": "winrm",
             "winrm_username": "vagrant",
             "winrm_password": "vagrant",
@@ -52,8 +60,7 @@
                 "../answer-files/2016/Autounattend.xml",
                 "../scripts/winrm.ps1"
             ]
-        }
-    ],
+    }],
     "provisioners": [
         {
             "type": "chef-solo",
@@ -63,9 +70,41 @@
                 "wsus-client::configure",
                 "win-templates::install_ps_modules",
                 "win-templates::install_vm_tools",
-                "win-templates::delete_pagefile"
+                "win-templates::uninstall_powershell_ise",
+                "win-templates::delete_pagefile",
+                "win-templates::enable_file_sharing",
+                "win-templates::disable_sam_notifications",
+                "win-templates::disable_UAC",
+                "win-templates::disable_shutdown_tracker",
+                "win-templates::show_hiddenFiles",
+                "win-templates::show_extensions",
+                "win-templates::remote_desktop",
+                "win-templates::set_local_account_token_filter_policy"
             ]
         },
+        {
+            "type": "powershell",
+            "scripts": [
+                "../scripts/Install-DotNet3.ps1",
+                "../scripts/Install-Containers.ps1",
+                "../scripts/windows-updates.ps1"
+            ],
+            "elevated_user": "vagrant",
+            "elevated_password": "vagrant"
+        },
+        {
+            "type": "windows-restart",
+            "restart_timeout": "15m"
+        },
+        {
+            "type": "powershell",
+            "scripts": [
+                "../scripts/add-docker-group.ps1",
+                "../scripts/install-docker.ps1"
+            ],
+            "elevated_user": "vagrant",
+            "elevated_password": "vagrant"
+        }, 
         {
             "type": "windows-restart",
             "restart_timeout": "15m"
@@ -79,10 +118,18 @@
             "guest_os_type": "windows",
             "skip_install": "true",
             "run_list": [
-                "win-templates::enable_file_sharing",
-                "win-templates::remote_desktop",
-                "win-templates::set_local_account_token_filter_policy"
+                "win-templates::clean_sxs",
+                "win-templates::add_postunattend",
+                "win-templates::add_pagefile",
+                "win-templates::remove_dirs",
+                "win-templates::add_setup_complete"
             ]
+        },
+        {
+            "type": "powershell",
+            "script": "../scripts/cleanup.ps1",
+            "elevated_user": "vagrant",
+            "elevated_password": "vagrant"
         }
     ],
     "post-processors": [
@@ -96,10 +143,12 @@
     "variables": {
         "memory": "4096",
         "cpus": "2",
+        "vm_disk_size": "61440",
         "headless": "true",
         "iso_checksum": "f185197af68fae4f0e06510a4579fc511ba27616",
         "iso_url": "../iso-images/en_windows_server_2016_x64_dvd_9718492.iso",
         "iso_checksum_type": "sha1",
-        "vmtools_iso_path": "C:/Windows/Temp/vmware-tools.iso"
+        "vmtools_iso_path": "C:/Windows/Temp/vmware-tools.iso",
+        "vboxTools_iso_path": "C:/Windows/Temp/VBoxGuestAdditions.iso"
     }
 }

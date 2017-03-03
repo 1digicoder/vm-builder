@@ -101,6 +101,12 @@
             "restart_timeout": "15m"
         },
         {
+            "type": "powershell",
+            "script": "../scripts/after-reboot.ps1",
+            "elevated_user": "vagrant",
+            "elevated_password": "vagrant"
+        },
+        {
             "type": "chef-solo",
             "remote_cookbook_paths": [
                 "c:/windows/temp/packer-chef-solo/cookbooks-0",

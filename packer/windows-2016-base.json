@@ -90,6 +90,7 @@
                 "../scripts/add-docker-group.ps1",
                 "../scripts/install-docker.ps1",
                 "../scripts/remove-windows-defender.ps1",
+                "../scripts/install-chocolatey.ps1",
                 "../scripts/windows-updates.ps1"
             ],
             "elevated_user": "vagrant",

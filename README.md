@@ -11,10 +11,12 @@
 * build development windows vm / docker host
 * create reference architecture of building containers for hosting microservices
 
-## Todo:
-* Get docker host scripts written
-* [vmware] Fix issue where vm tools don't always install
-* [virtualbox] Write script to get tools installed - wintemplate chef recipe
+## Lessons Learned:
+* coordination between dsc, powershell, and chef is tricky
+* There is an order that things must be done. Enable/Disable Features, Remove anything not turned on, Windows Update, Final Clean, package
+* Windows Server SKUs puts network into Public and locks down ports. This require ports opened so that Packer can communicate with the VM via WinRM to automate the given tasks
+* Chef runs in non-elevated process, so only certain tasks can happen here
+* Packer allows you to elevate powershell processes on demand, so best suited for enabling/disabling windows features
 
 ## Build golden image:
 * Download the windows 2016 ISO image to the ./iso-images folder

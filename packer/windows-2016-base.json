@@ -133,7 +133,7 @@
         {
         "type": "vagrant",
         "keep_input_artifact": true,
-        "output": "windows2012r2min-{{.Provider}}.box",
+        "output": "windows2016min-{{.Provider}}.box",
         "vagrantfile_template": "vagrantfile-windows.template"
         }
     ],

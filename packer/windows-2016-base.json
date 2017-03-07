@@ -93,7 +93,18 @@
                 "../scripts/add-docker-group.ps1",
                 "../scripts/install-docker.ps1",
                 "../scripts/remove-windows-defender.ps1",
-                "../scripts/install-chocolatey.ps1",
+                "../scripts/install-chocolatey.ps1"
+            ],
+            "elevated_user": "vagrant",
+            "elevated_password": "vagrant"
+        },
+        {
+            "type": "windows-restart",
+            "restart_timeout": "15m"
+        },
+        {
+            "type": "powershell",
+            "scripts": [
                 "../scripts/windows-updates.ps1"
             ],
             "elevated_user": "vagrant",

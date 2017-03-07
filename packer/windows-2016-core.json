@@ -35,6 +35,7 @@
                 "RemoteDispaly.vnc.port": "5900",
                 "memsize": "{{ user `memory` }}",
                 "numvcpus": "{{ user `cpus` }}",
+                "vhv.enable": "true",
                 "scsi0.virtualDev": "lsisas1068"
             },
             "guest_os_type": "windows9srv-64",

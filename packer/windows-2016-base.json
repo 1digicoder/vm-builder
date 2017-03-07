@@ -30,11 +30,14 @@
         {
             "type": "vmware-iso",
             "vmx_data": {
-                "gui.fitguestusingnativedisplayresolution": "false",
+                "mks.enable3d": "true",
+                "svga.graphicsMemoryKB": "1048576",
+                "gui.fitguestusingnativedisplayresolution": "true",
                 "RemoteDisplay.vnc.enabled": "false",
                 "RemoteDispaly.vnc.port": "5900",
                 "memsize": "{{ user `memory` }}",
                 "numvcpus": "{{ user `cpus` }}",
+                "vhv.enable": "true",
                 "scsi0.virtualDev": "lsisas1068"
             },
             "guest_os_type": "windows9srv-64",
@@ -46,7 +49,7 @@
             "disk_size": "{{ user `vm_disk_size` }}",
             "vnc_port_min": 5900,
             "vnc_port_max": 5980,
-            "version": 11,
+            "version": 12,
             "communicator": "winrm",
             "winrm_username": "vagrant",
             "winrm_password": "vagrant",

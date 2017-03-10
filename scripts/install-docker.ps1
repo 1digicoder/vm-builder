@@ -14,5 +14,8 @@ copy $env:TEMP\docker\*.exe $env:ProgramFiles\docker
 Remove-Item $env:TEMP\docker-1.13.1.zip
 [Environment]::SetEnvironmentVariable("Path", $env:Path + ";$($env:ProgramFiles)\docker", [EnvironmentVariableTarget]::Machine)
 $env:Path = $env:Path + ";$($env:ProgramFiles)\docker"
+mkdir e:\docker_containers
+copy daemon.json "C:\ProgramData\docker\config\"
+
 . dockerd --register-service -H npipe:// -H 0.0.0.0:2375 -G docker
 Start-Service docker

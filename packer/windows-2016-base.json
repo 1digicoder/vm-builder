@@ -38,7 +38,8 @@
                 "memsize": "{{ user `memory` }}",
                 "numvcpus": "{{ user `cpus` }}",
                 "vhv.enable": "true",
-                "scsi0.virtualDev": "lsisas1068"
+                "scsi0.virtualDev": "lsisas1068",
+                "scsi1.virtualDev": "lsisas1068"
             },
             "guest_os_type": "windows9srv-64",
             "boot_wait": "2m",
@@ -47,6 +48,7 @@
             "iso_checksum": "{{ user `iso_checksum` }}",
             "iso_checksum_type": "{{ user `iso_checksum_type` }}",
             "disk_size": "{{ user `vm_disk_size` }}",
+            "disk_additional_size" : [ 153600 ],
             "vnc_port_min": 5900,
             "vnc_port_max": 5980,
             "version": 12,
@@ -88,6 +90,7 @@
         {
             "type": "powershell",
             "scripts": [
+                "../scripts/format-dataDrive.ps1",
                 "../scripts/Install-DotNet3.ps1",
                 "../scripts/Install-Containers.ps1",
                 "../scripts/add-docker-group.ps1",
@@ -109,38 +112,6 @@
             ],
             "elevated_user": "vagrant",
             "elevated_password": "vagrant"
-        },
-        {
-            "type": "windows-restart",
-            "restart_timeout": "15m"
-        },
-        {
-            "type": "powershell",
-            "script": "../scripts/after-reboot.ps1",
-            "elevated_user": "vagrant",
-            "elevated_password": "vagrant"
-        },
-        {
-            "type": "chef-solo",
-            "remote_cookbook_paths": [
-                "c:/windows/temp/packer-chef-solo/cookbooks-0",
-                "c:/windows/temp/packer-chef-solo/cookbooks-1"
-            ],
-            "guest_os_type": "windows",
-            "skip_install": "true",
-            "run_list": [
-                "win-templates::clean_sxs",
-                "win-templates::add_postunattend",
-                "win-templates::add_pagefile",
-                "win-templates::remove_dirs",
-                "win-templates::add_setup_complete"
-            ]
-        },
-        {
-            "type": "powershell",
-            "script": "../scripts/cleanup.ps1",
-            "elevated_user": "vagrant",
-            "elevated_password": "vagrant"
         }
     ],
     "post-processors": [
@@ -154,7 +125,7 @@
     "variables": {
         "memory": "4096",
         "cpus": "2",
-        "vm_disk_size": "61440",
+        "vm_disk_size": "51200",
         "headless": "true",
         "iso_checksum": "f185197af68fae4f0e06510a4579fc511ba27616",
         "iso_url": "../iso-images/en_windows_server_2016_x64_dvd_9718492.iso",

@@ -112,6 +112,10 @@
             ],
             "elevated_user": "vagrant",
             "elevated_password": "vagrant"
+        },
+        {
+            "type": "windows-restart",
+            "restart_timeout": "15m"
         }
     ],
     "post-processors": [

@@ -116,6 +116,28 @@
         {
             "type": "windows-restart",
             "restart_timeout": "15m"
+        },
+        {
+            "type": "chef-solo",
+            "remote_cookbook_paths": [
+                "c:/windows/temp/packer-chef-solo/cookbooks-0",
+                "c:/windows/temp/packer-chef-solo/cookbooks-1"
+            ],
+            "guest_os_type": "windows",
+            "skip_install": "true",
+            "run_list": [
+                "win-templates::clean_sxs",
+                "win-templates::add_postunattend",
+                "win-templates::add_pagefile",
+                "win-templates::remove_dirs",
+                "win-templates::add_setup_complete"
+            ]
+        },
+        {
+            "type": "powershell",
+            "script": "../scripts/cleanup.ps1",
+            "elevated_user": "vagrant",
+            "elevated_password": "vagrant"
         }
     ],
     "post-processors": [

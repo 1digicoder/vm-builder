@@ -1,3 +1,5 @@
 packer_cache/*
 output-*-iso/*
 *.box
+*.vdi
+*.vmdk

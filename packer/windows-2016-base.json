@@ -5,7 +5,9 @@
             "vboxmanage": [
                 [ "modifyvm", "{{.Name}}", "--memory", "{{ user `memory` }}" ],
                 [ "modifyvm", "{{.Name}}", "--vram", "48" ],
-                [ "modifyvm", "{{.Name}}", "--cpus", "{{ user `cpus` }}" ]
+                [ "modifyvm", "{{.Name}}", "--cpus", "{{ user `cpus` }}" ],
+                [ "createhd", "--filename", "second_drive.vmdk", "--size", 131072, "--format", "vmdk"],
+                [ "storageattach", "{{.Name}}", "--storagectl", "IDE Controller", "--port", "1", "--device", "0", "--type", "hdd", "--medium", "second_drive.vmdk" ]
             ],
             "guest_additions_mode": "{{ user `guest_additions_mode` }}",
             "guest_additions_path": "{{ user `vboxTools_iso_path` }}",

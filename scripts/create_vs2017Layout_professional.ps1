@@ -3,6 +3,7 @@
 --lang en-US `
 --add Microsoft.VisualStudio.Workload.Azure `
 Microsoft.VisualStudio.Workload.Data `
+Microsoft.VisualStudio.Workload.ManagedDesktop `
 Microsoft.VisualStudio.Workload.NetCoreTools `
 Microsoft.VisualStudio.Workload.NetWeb `
 Microsoft.VisualStudio.Workload.Node `

@@ -3,24 +3,26 @@
 
 $NET_PREFIX     = "172.16.124"
 $BRIDGE_IF      = "vmnet1"
+$DKR_LINUX      = "#{$NET_PREFIX}.40"
 $DC_IP          = "#{$NET_PREFIX}.50"
 $DEV_IP         = "#{$NET_PREFIX}.51"
 $BASE_BOX       = "windows-2016"
 $CORE_BOX       = "windows-2016-core"
+$UBUNTU_BOX     = "ubuntu/xenial64"
 
 Vagrant.configure(2) do |config|
-  config.vm.guest = :windows
-  config.vm.communicator = "winrm"
-  config.winrm.username = "vagrant"
-  config.winrm.password = "vagrant"
   config.vm.boot_timeout = 300
   config.vm.synced_folder "../iso-images", "/isoimages"
   config.vm.synced_folder "../scripts", "/scripts"
 
   # Domain controller setup
   config.vm.define "dc01" do |config|
+    config.vm.guest = :windows
     config.vm.box = $CORE_BOX
     config.vm.hostname = "dc01"
+    config.vm.communicator = "winrm"
+    config.winrm.username = "vagrant"
+    config.winrm.password = "vagrant"
     config.vm.network "public_network", bridge: $BRIDGE_IF, ip: $DC_IP
       
     config.vm.provider "vmware_fusion" do |fusion|
@@ -49,9 +51,13 @@ Vagrant.configure(2) do |config|
 
   #Developer machine - VS2017 setup
   config.vm.define "devEnt" do |config|  
+    config.vm.guest = :windows
     config.vm.box = $BASE_BOX
     config.vm.hostname = "dev01"
-    config.vm.network "public_network", bridge: $BRIDGE_IF, ip: $DC_IP
+    config.vm.communicator = "winrm"
+    config.winrm.username = "vagrant"
+    config.winrm.password = "vagrant"
+    config.vm.network "public_network", bridge: $BRIDGE_IF, ip: $DEV_IP
 
     config.vm.provider "vmware_fusion" do |fusion|
       fusion.vmx["memsize"] = "8192"
@@ -81,5 +87,42 @@ Vagrant.configure(2) do |config|
     config.vm.provision :shell, :path => "../scripts/install-basic-tools.ps1"
     config.vm.provision :shell, :path => "../scripts/install-azure-cli.ps1"
    
+  end
+
+
+  #Docker Host Machine - Ubuntu/xenial64 setup
+  config.vm.define "dockerHost" do |config|  
+    config.vm.box = $UBUNTU_BOX
+    config.vm.hostname = "dev01"
+    config.vm.communicator = "ssh"
+    config.ssh.username = "ubuntu"
+    config.ssh.insert_key = false
+    config.ssh.forward_agent = true
+    config.vm.network "public_network", bridge: $BRIDGE_IF, ip: $DKR_LINUX
+
+    config.vm.provider "vmware_fusion" do |fusion|
+      fusion.vmx["memsize"] = "2048"
+      fusion.vmx["numvcpus"] = "2"
+      fusion.vmx["ethernet0.pcislotnumber"] = "33"
+      fusion.fmx["ethernet0.virtualdev"] = "vmxnet3"
+      fusion.fmx["ethernet1.virtualdev"] = "vmxnet3"
+      fusion.linked_clone = false
+    end
+
+    config.vm.provider "virtualbox" do |vb|
+      vb.memory = 2048
+      vb.linked_clone = true
+      vb.cpus = 2
+    end
+
+    config.vm.provider 'hyperv' do |hv|
+      hv.ip_address_timeout = 240
+      hv.memory = 2048
+    end
+
+    config.vm.provider :libvirt do |domain|
+      domain.memory = 2048
+      domain.cpus = 2
+    end
   end
 end

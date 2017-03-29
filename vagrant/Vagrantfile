@@ -93,10 +93,10 @@ Vagrant.configure(2) do |config|
   #Docker Host Machine - Ubuntu/xenial64 setup
   config.vm.define "dockerHost" do |config|  
     config.vm.box = $UBUNTU_BOX
-    config.vm.hostname = "dev01"
+    config.vm.hostname = "docker01"
     config.vm.communicator = "ssh"
     config.ssh.username = "ubuntu"
-    config.ssh.insert_key = false
+    config.ssh.insert_key = true
     config.ssh.forward_agent = true
     config.vm.network "public_network", bridge: $BRIDGE_IF, ip: $DKR_LINUX
 
@@ -124,5 +124,7 @@ Vagrant.configure(2) do |config|
       domain.memory = 2048
       domain.cpus = 2
     end
+
+    config.vm.provision :shell, :path => "../scripts/installDocker.sh"
   end
 end
